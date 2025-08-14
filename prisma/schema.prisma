@@ -1,0 +1,273 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  GROOMER
+  CLIENT
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+  NO_SHOW
+}
+
+enum PhotoType {
+  BEFORE
+  AFTER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(CLIENT)
+  phone         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  groomer       Groomer?
+  client        Client?
+  photos        Photo[]   @relation("UserPhotos")
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Groomer {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  user      User        @relation(fields: [userId], references: [id])
+  bio       String?
+  active    Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  appts     Appointment[]
+}
+
+model Client {
+  id        String      @id @default(cuid())
+  userId    String?     @unique
+  user      User?       @relation(fields: [userId], references: [id])
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  city      String?
+  state     String?
+  postal    String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  pets      Pet[]
+  appts     Appointment[]
+  orders    Order[]
+  invoices  Invoice[]
+}
+
+model Pet {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id])
+  name      String
+  species   String    @default("dog")
+  breed     String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  appts     Appointment[]
+}
+
+model Service {
+  id        String   @id @default(cuid())
+  name      String
+  description String?
+  priceCents Int
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  appointments Appointment[]
+  invoiceItems InvoiceItem[]
+}
+
+model Appointment {
+  id         String             @id @default(cuid())
+  clientId   String
+  client     Client             @relation(fields: [clientId], references: [id])
+  petId      String
+  pet        Pet                @relation(fields: [petId], references: [id])
+  groomerId  String
+  groomer    Groomer            @relation(fields: [groomerId], references: [id])
+  serviceId  String?
+  service    Service?           @relation(fields: [serviceId], references: [id])
+  start      DateTime
+  end        DateTime
+  status     AppointmentStatus  @default(SCHEDULED)
+  notes      String?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  photos     Photo[]
+  invoice    Invoice?
+  survey     Survey?
+  reviewRequest ReviewRequest?
+}
+
+model Photo {
+  id            String    @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  uploadedById  String
+  uploadedBy    User       @relation("UserPhotos", fields: [uploadedById], references: [id])
+  type          PhotoType
+  url           String
+  createdAt     DateTime  @default(now())
+}
+
+model Product {
+  id         String   @id @default(cuid())
+  name       String
+  sku        String   @unique
+  priceCents Int
+  active     Boolean  @default(true)
+  stock      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  items      OrderItem[]
+}
+
+model Order {
+  id         String     @id @default(cuid())
+  clientId   String
+  client     Client     @relation(fields: [clientId], references: [id])
+  totalCents Int        @default(0)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  items      OrderItem[]
+  payment    Payment?
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id])
+  productId  String
+  product    Product @relation(fields: [productId], references: [id])
+  quantity   Int     @default(1)
+  unitPriceCents Int
+}
+
+model Invoice {
+  id         String     @id @default(cuid())
+  clientId   String
+  client     Client     @relation(fields: [clientId], references: [id])
+  appointmentId String? @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  totalCents Int        @default(0)
+  status     String     @default("draft")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  items      InvoiceItem[]
+  payment    Payment?
+}
+
+model InvoiceItem {
+  id         String   @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id])
+  serviceId  String?
+  service    Service? @relation(fields: [serviceId], references: [id])
+  description String
+  amountCents Int
+  quantity    Int      @default(1)
+}
+
+model Payment {
+  id           String   @id @default(cuid())
+  orderId      String? @unique
+  order        Order?   @relation(fields: [orderId], references: [id])
+  invoiceId    String? @unique
+  invoice      Invoice? @relation(fields: [invoiceId], references: [id])
+  provider     String   @default("stripe") // stripe, paypal, apple_pay, cash_app
+  providerId   String?
+  amountCents  Int
+  currency     String   @default("usd")
+  status       String   @default("pending")
+  metadata     String?  // JSON for provider-specific data
+  createdAt    DateTime @default(now())
+}
+
+// NextAuth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Additional models for comprehensive CRM
+model Discount {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  type        String   // percentage, fixed_amount
+  value       Int      // percentage (e.g., 20 for 20%) or cents
+  active      Boolean  @default(true)
+  expiresAt   DateTime?
+  usageLimit  Int?
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Survey {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  rating        Int      // 1-5 stars
+  feedback      String?
+  submittedAt   DateTime @default(now())
+}
+
+model ReviewRequest {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  sentAt        DateTime @default(now())
+  clickedAt     DateTime?
+  reviewUrl     String?  // Google Business review URL
+}
