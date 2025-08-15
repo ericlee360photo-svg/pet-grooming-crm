@@ -100,18 +100,10 @@ export default function AppointmentModal({
   const fetchPets = async (clientId: string) => {
     try {
       const response = await fetch(`/api/clients/${clientId}/pets`);
-      setPets(await response.json());
+      const petsData = await response.json();
+      setPets(petsData);
     } catch (error) {
       console.error("Failed to fetch pets:", error);
-    }
-  };
-
-  const handleClientChange = (clientId: string) => {
-    setFormData(prev => ({ ...prev, clientId, petId: "" }));
-    if (clientId) {
-      fetchPets(clientId);
-    } else {
-      setPets([]);
     }
   };
 
@@ -120,17 +112,16 @@ export default function AppointmentModal({
     setLoading(true);
 
     try {
-      const url = appointmentId ? "/api/appointments" : "/api/appointments";
-      const method = appointmentId ? "PUT" : "POST";
+      const url = appointmentId 
+        ? `/api/appointments/${appointmentId}`
+        : "/api/appointments";
       
-      const payload = appointmentId 
-        ? { id: appointmentId, ...formData }
-        : formData;
+      const method = appointmentId ? "PUT" : "POST";
 
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
@@ -138,7 +129,7 @@ export default function AppointmentModal({
         onClose();
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to save appointment");
+        alert(error.message || "Failed to save appointment");
       }
     } catch (error) {
       console.error("Save appointment error:", error);
@@ -148,206 +139,196 @@ export default function AppointmentModal({
     }
   };
 
-  const handleDelete = async () => {
-    if (!appointmentId) return;
-    
-    if (confirm("Are you sure you want to delete this appointment?")) {
-      try {
-        const response = await fetch(`/api/appointments?id=${appointmentId}`, {
-          method: "DELETE",
-        });
-        
-        if (response.ok) {
-          onSave();
-          onClose();
-        } else {
-          alert("Failed to delete appointment");
-        }
-      } catch (error) {
-        console.error("Delete appointment error:", error);
-        alert("Failed to delete appointment");
-      }
+  const handleClientChange = (clientId: string) => {
+    setFormData(prev => ({ ...prev, clientId, petId: "" }));
+    setPets([]);
+    if (clientId) {
+      fetchPets(clientId);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-2xl m-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             {appointmentId ? "Edit Appointment" : "New Appointment"}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X size={24} />
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Client
-              </label>
-              <select
-                value={formData.clientId}
-                onChange={(e) => handleClientChange(e.target.value)}
-                required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">Select a client</option>
-                {clients.map((client: any) => (
-                  <option key={client.id} value={client.id}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          {/* Client Selection */}
+          <div>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+              Client *
+            </label>
+            <select
+              value={formData.clientId}
+              onChange={(e) => handleClientChange(e.target.value)}
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
+            >
+              <option value="">Select a client</option>
+              {clients.map((client: any) => (
+                <option key={client.id} value={client.id}>
+                  {client.name} ({client.email})
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Pet
-              </label>
-              <select
-                value={formData.petId}
-                onChange={(e) => setFormData(prev => ({ ...prev, petId: e.target.value }))}
-                required
-                disabled={!formData.clientId}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">Select a pet</option>
-                {pets.map((pet: any) => (
-                  <option key={pet.id} value={pet.id}>
-                    {pet.name} ({pet.species})
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Pet Selection */}
+          <div>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+              Pet *
+            </label>
+            <select
+              value={formData.petId}
+              onChange={(e) => setFormData(prev => ({ ...prev, petId: e.target.value }))}
+              required
+              disabled={!formData.clientId}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base disabled:bg-gray-100"
+            >
+              <option value="">Select a pet</option>
+              {pets.map((pet: any) => (
+                <option key={pet.id} value={pet.id}>
+                  {pet.name} ({pet.species})
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Groomer
-              </label>
-              <select
-                value={formData.groomerId}
-                onChange={(e) => setFormData(prev => ({ ...prev, groomerId: e.target.value }))}
-                required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">Select a groomer</option>
-                {groomers.map((groomer: any) => (
-                  <option key={groomer.id} value={groomer.id}>
-                    {groomer.user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Groomer Selection */}
+          <div>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+              Groomer *
+            </label>
+            <select
+              value={formData.groomerId}
+              onChange={(e) => setFormData(prev => ({ ...prev, groomerId: e.target.value }))}
+              required
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
+            >
+              <option value="">Select a groomer</option>
+              {groomers.map((groomer: any) => (
+                <option key={groomer.id} value={groomer.id}>
+                  {groomer.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Service
-              </label>
-              <select
-                value={formData.serviceId}
-                onChange={(e) => setFormData(prev => ({ ...prev, serviceId: e.target.value }))}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">Select a service (optional)</option>
-                {services.map((service: any) => (
-                  <option key={service.id} value={service.id}>
-                    {service.name} - ${(service.priceCents / 100).toFixed(2)}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Service Selection */}
+          <div>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+              Service
+            </label>
+            <select
+              value={formData.serviceId}
+              onChange={(e) => setFormData(prev => ({ ...prev, serviceId: e.target.value }))}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
+            >
+              <option value="">Select a service</option>
+              {services.map((service: any) => (
+                <option key={service.id} value={service.id}>
+                  {service.name} - ${service.price}
+                </option>
+              ))}
+            </select>
+          </div>
 
+          {/* Date and Time */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start Time
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                Start Time *
               </label>
               <input
                 type="datetime-local"
                 value={formData.start}
                 onChange={(e) => setFormData(prev => ({ ...prev, start: e.target.value }))}
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                End Time
+              <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+                End Time *
               </label>
               <input
                 type="datetime-local"
                 value={formData.end}
                 onChange={(e) => setFormData(prev => ({ ...prev, end: e.target.value }))}
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
               />
             </div>
           </div>
 
-          {appointmentId && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="SCHEDULED">Scheduled</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="CANCELED">Canceled</option>
-                <option value="NO_SHOW">No Show</option>
-              </select>
-            </div>
-          )}
-
+          {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
+              Status
+            </label>
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
+            >
+              <option value="SCHEDULED">Scheduled</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELED">Canceled</option>
+              <option value="NO_SHOW">No Show</option>
+            </select>
+          </div>
+
+          {/* Notes */}
+          <div>
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
               Notes
             </label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
               rows={3}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base resize-none"
               placeholder="Any special instructions or notes..."
             />
           </div>
 
-          <div className="flex justify-between pt-4">
-            <div>
-              {appointmentId && (
-                <button
-                  type="button"
-                  onClick={handleDelete}
-                  className="px-4 py-2 text-red-600 border border-red-600 rounded-md hover:bg-red-50"
-                >
-                  Delete
-                </button>
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base font-medium"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Saving...
+                </div>
+              ) : (
+                appointmentId ? "Update Appointment" : "Create Appointment"
               )}
-            </div>
-            <div className="space-x-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
-              >
-                {loading ? "Saving..." : appointmentId ? "Update" : "Create"}
-              </button>
-            </div>
+            </button>
           </div>
         </form>
       </div>

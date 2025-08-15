@@ -7,13 +7,14 @@ const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().min(1),
-  role: z.enum(["CLIENT", "GROOMER", "ADMIN"]).default("CLIENT"),
+  phone: z.string().optional(),
+  businessSlug: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, password, name, role } = signupSchema.parse(body);
+    const { email, password, name, phone, businessSlug } = signupSchema.parse(body);
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -28,31 +29,33 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Find business if businessSlug is provided
+    let business = null;
+    if (businessSlug) {
+      business = await prisma.business.findUnique({
+        where: { slug: businessSlug },
+      });
+    }
+
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name,
-        role,
+        role: "CLIENT", // Only allow client signups
       },
     });
 
-    // Create associated Client or Groomer record
-    if (role === "CLIENT") {
-      await prisma.client.create({
-        data: {
-          userId: user.id,
-          name,
-          email,
-        },
-      });
-    } else if (role === "GROOMER") {
-      await prisma.groomer.create({
-        data: {
-          userId: user.id,
-        },
-      });
-    }
+    // Create associated Client record
+    await prisma.client.create({
+      data: {
+        userId: user.id,
+        name,
+        email,
+        phone: phone || null,
+        businessId: business?.id || null, // Link to business if provided
+      },
+    });
 
     return NextResponse.json({
       user: {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
+import BarkBookLogo from "@/components/BarkBookLogo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pawfect CRM - Pet Grooming Management",
-  description: "Complete CRM solution for pet grooming businesses",
+  title: "BarkBook - The Complete Grooming Business Platform",
+  description: "Streamline your grooming business with branded booking pages, smart scheduling, and client management. Start your free trial today!",
 };
 
 export default function RootLayout({
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-primary-50`}
       >
         <Providers>{children}</Providers>
       </body>

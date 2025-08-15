@@ -104,8 +104,8 @@ export default function PhotoUpload({ appointmentId, type, onPhotoUploaded }: Ph
         videoRef.current.srcObject = mediaStream;
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
-      alert('Unable to access camera');
+      console.error('Camera access error:', error);
+      alert('Unable to access camera. Please check permissions.');
     }
   };
 
@@ -118,113 +118,103 @@ export default function PhotoUpload({ appointmentId, type, onPhotoUploaded }: Ph
   };
 
   const capturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-
-    if (!context) return;
-
-    // Set canvas size to video size
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    // Draw video frame to canvas
-    context.drawImage(video, 0, 0);
-
-    // Convert canvas to blob
-    canvas.toBlob(async (blob) => {
-      if (blob) {
-        const file = new File([blob], `${type.toLowerCase()}-${Date.now()}.jpg`, {
-          type: 'image/jpeg',
-        });
-        await uploadPhoto(file);
-        stopCamera();
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      
+      if (context) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' });
+            uploadPhoto(file);
+            stopCamera();
+          }
+        }, 'image/jpeg', 0.8);
       }
-    }, 'image/jpeg', 0.8);
+    }
   };
 
-  return (
-    <div className="space-y-4">
-      <div className="text-sm font-medium text-gray-700">
-        Upload {type.toLowerCase()} photo
-      </div>
-
-      {showCamera ? (
-        <div className="space-y-4">
+  if (showCamera) {
+    return (
+      <div className="fixed inset-0 bg-black z-50 flex flex-col">
+        <div className="flex-1 relative">
           <video
             ref={videoRef}
             autoPlay
             playsInline
-            className="w-full rounded-lg"
+            className="w-full h-full object-cover"
           />
           <canvas ref={canvasRef} className="hidden" />
-          <div className="flex gap-2">
-            <button
-              onClick={capturePhoto}
-              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
-              Capture Photo
-            </button>
+          
+          {/* Camera Controls */}
+          <div className="absolute top-4 left-4">
             <button
               onClick={stopCamera}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+              className="p-3 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-colors"
             >
-              Cancel
+              <X size={24} />
+            </button>
+          </div>
+          
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
+            <button
+              onClick={capturePhoto}
+              disabled={uploading}
+              className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+            >
+              <div className="w-12 h-12 bg-gray-800 rounded-full"></div>
             </button>
           </div>
         </div>
-      ) : (
-        <div className="space-y-4">
-          <div
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-              dragOver
-                ? 'border-indigo-500 bg-indigo-50'
-                : 'border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            <div className="space-y-2">
-              <Upload className="mx-auto h-8 w-8 text-gray-400" />
-              <div className="text-sm text-gray-600">
-                Drag and drop an image, or{' '}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-indigo-600 hover:text-indigo-500 font-medium"
-                >
-                  browse
-                </button>
-              </div>
-            </div>
-          </div>
+      </div>
+    );
+  }
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50"
-            >
-              <Upload size={16} className="inline mr-2" />
-              Choose File
-            </button>
-            <button
-              type="button"
-              onClick={startCamera}
-              disabled={uploading}
-              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
-            >
-              <Camera size={16} className="inline mr-2" />
-              Take Photo
-            </button>
+  return (
+    <div className="space-y-4">
+      {/* Upload Area */}
+      <div
+        className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer ${
+          dragOver
+            ? 'border-primary-500 bg-primary-50'
+            : 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
+        } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={() => !uploading && fileInputRef.current?.click()}
+      >
+        <div className="flex flex-col items-center space-y-3">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary-100 rounded-full flex items-center justify-center">
+            <Upload className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
+          </div>
+          <div>
+            <p className="text-sm sm:text-base font-medium text-gray-900">
+              Upload {type.toLowerCase()} photo
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+              Drag and drop or click to select
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
+      {/* Camera Button */}
+      <button
+        onClick={startCamera}
+        disabled={uploading}
+        className="w-full flex items-center justify-center space-x-2 bg-primary-600 text-white py-3 sm:py-4 px-4 rounded-xl font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        <Camera className="w-5 h-5 sm:w-6 sm:h-6" />
+        <span className="text-sm sm:text-base">Take Photo with Camera</span>
+      </button>
+
+      {/* Hidden File Input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -238,9 +228,11 @@ export default function PhotoUpload({ appointmentId, type, onPhotoUploaded }: Ph
         className="hidden"
       />
 
+      {/* Upload Progress */}
       {uploading && (
-        <div className="text-center text-sm text-gray-600">
-          Uploading photo...
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600">Uploading photo...</p>
         </div>
       )}
     </div>

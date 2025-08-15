@@ -1,6 +1,6 @@
 {
-  "name": "pet-grooming-crm",
-  "version": "0.1.0",
+  "name": "barkbook",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",

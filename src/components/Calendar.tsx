@@ -78,39 +78,72 @@ export default function Calendar({ groomerId, onEventClick, onDateSelect }: Cale
   };
 
   return (
-    <div className="p-4">
+    <div className="p-2 sm:p-4">
       {loading && (
-        <div className="mb-4 text-center text-gray-600">Loading appointments...</div>
+        <div className="mb-4 text-center text-gray-600 text-sm sm:text-base">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto mb-2"></div>
+          Loading appointments...
+        </div>
       )}
-      <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        initialView="timeGridWeek"
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-        height="auto"
-        events={events}
-        eventClick={handleEventClick}
-        selectable={true}
-        select={handleDateSelect}
-        selectMirror={true}
-        dayMaxEvents={true}
-        weekends={true}
-        businessHours={{
-          daysOfWeek: [1, 2, 3, 4, 5, 6], // Monday - Saturday
-          startTime: "08:00",
-          endTime: "18:00",
-        }}
-        slotMinTime="07:00:00"
-        slotMaxTime="20:00:00"
-        eventTimeFormat={{
-          hour: "numeric",
-          minute: "2-digit",
-          meridiem: "short",
-        }}
-      />
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView={window.innerWidth < 768 ? "dayGridMonth" : "timeGridWeek"}
+          headerToolbar={{
+            left: "prev,next",
+            center: "title",
+            right: window.innerWidth < 768 ? "dayGridMonth" : "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          height="auto"
+          events={events}
+          eventClick={handleEventClick}
+          selectable={true}
+          select={handleDateSelect}
+          selectMirror={true}
+          dayMaxEvents={window.innerWidth < 768 ? 3 : true}
+          weekends={true}
+          businessHours={{
+            daysOfWeek: [1, 2, 3, 4, 5, 6], // Monday - Saturday
+            startTime: "08:00",
+            endTime: "18:00",
+          }}
+          slotMinTime="07:00:00"
+          slotMaxTime="20:00:00"
+          eventTimeFormat={{
+            hour: "numeric",
+            minute: "2-digit",
+            meridiem: "short",
+          }}
+          eventDisplay={window.innerWidth < 768 ? "list-item" : "block"}
+          dayHeaderFormat={{
+            weekday: window.innerWidth < 768 ? "short" : "long",
+          }}
+          titleFormat={{
+            year: "numeric",
+            month: window.innerWidth < 768 ? "short" : "long",
+          }}
+          buttonText={{
+            today: "Today",
+            month: "Month",
+            week: "Week",
+            day: "Day",
+          }}
+          moreLinkClick="popover"
+          eventClassNames="cursor-pointer hover:opacity-80 transition-opacity"
+          dayCellClassNames="hover:bg-gray-50 transition-colors"
+          slotLabelFormat={{
+            hour: "numeric",
+            minute: "2-digit",
+            meridiem: "short",
+          }}
+          slotLabelClassNames="text-xs sm:text-sm font-medium text-gray-600"
+          eventClassNames="text-xs sm:text-sm font-medium"
+          dayHeaderClassNames="text-xs sm:text-sm font-semibold text-gray-700"
+          titleClassNames="text-sm sm:text-base font-bold text-gray-900"
+          buttonClassNames="text-xs sm:text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-2 sm:px-3 py-1 sm:py-2 rounded"
+          todayButtonClassNames="text-xs sm:text-sm font-medium bg-primary-600 text-white hover:bg-primary-700 px-2 sm:px-3 py-1 sm:py-2 rounded"
+        />
+      </div>
     </div>
   );
 }

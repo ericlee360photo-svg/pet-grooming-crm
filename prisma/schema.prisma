@@ -25,6 +25,20 @@ enum PhotoType {
   AFTER
 }
 
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+  TRIALING
+}
+
+enum PlanTier {
+  BASIC
+  PRO
+  GROWTH
+}
+
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -44,33 +58,37 @@ model User {
 }
 
 model Groomer {
-  id        String      @id @default(cuid())
-  userId    String      @unique
-  user      User        @relation(fields: [userId], references: [id])
-  bio       String?
-  active    Boolean     @default(true)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  appts     Appointment[]
+  id         String      @id @default(cuid())
+  businessId String
+  business   Business    @relation(fields: [businessId], references: [id])
+  userId     String      @unique
+  user       User        @relation(fields: [userId], references: [id])
+  bio        String?
+  active     Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  appts      Appointment[]
 }
 
 model Client {
-  id        String      @id @default(cuid())
-  userId    String?     @unique
-  user      User?       @relation(fields: [userId], references: [id])
-  name      String
-  email     String?
-  phone     String?
-  address   String?
-  city      String?
-  state     String?
-  postal    String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  pets      Pet[]
-  appts     Appointment[]
-  orders    Order[]
-  invoices  Invoice[]
+  id         String      @id @default(cuid())
+  businessId String
+  business   Business    @relation(fields: [businessId], references: [id])
+  userId     String?     @unique
+  user       User?       @relation(fields: [userId], references: [id])
+  name       String
+  email      String?
+  phone      String?
+  address    String?
+  city       String?
+  state      String?
+  postal     String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  pets       Pet[]
+  appts      Appointment[]
+  orders     Order[]
+  invoices   Invoice[]
 }
 
 model Pet {
@@ -87,41 +105,47 @@ model Pet {
 }
 
 model Service {
-  id        String   @id @default(cuid())
-  name      String
-  description String?
-  priceCents Int
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  businessId   String
+  business     Business @relation(fields: [businessId], references: [id])
+  name         String
+  description  String?
+  priceCents   Int
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   appointments Appointment[]
   invoiceItems InvoiceItem[]
 }
 
 model Appointment {
-  id         String             @id @default(cuid())
-  clientId   String
-  client     Client             @relation(fields: [clientId], references: [id])
-  petId      String
-  pet        Pet                @relation(fields: [petId], references: [id])
-  groomerId  String
-  groomer    Groomer            @relation(fields: [groomerId], references: [id])
-  serviceId  String?
-  service    Service?           @relation(fields: [serviceId], references: [id])
-  start      DateTime
-  end        DateTime
-  status     AppointmentStatus  @default(SCHEDULED)
-  notes      String?
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  photos     Photo[]
-  invoice    Invoice?
-  survey     Survey?
+  id            String             @id @default(cuid())
+  businessId    String
+  business      Business           @relation(fields: [businessId], references: [id])
+  clientId      String
+  client        Client             @relation(fields: [clientId], references: [id])
+  petId         String
+  pet           Pet                @relation(fields: [petId], references: [id])
+  groomerId     String
+  groomer       Groomer            @relation(fields: [groomerId], references: [id])
+  serviceId     String?
+  service       Service?           @relation(fields: [serviceId], references: [id])
+  start         DateTime
+  end           DateTime
+  status        AppointmentStatus  @default(SCHEDULED)
+  notes         String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  photos        Photo[]
+  invoice       Invoice?
+  survey        Survey?
   reviewRequest ReviewRequest?
 }
 
 model Photo {
   id            String    @id @default(cuid())
+  businessId    String
+  business      Business  @relation(fields: [businessId], references: [id])
   appointmentId String
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   uploadedById  String
@@ -133,6 +157,8 @@ model Photo {
 
 model Product {
   id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id])
   name       String
   sku        String   @unique
   priceCents Int
@@ -165,17 +191,19 @@ model OrderItem {
 }
 
 model Invoice {
-  id         String     @id @default(cuid())
-  clientId   String
-  client     Client     @relation(fields: [clientId], references: [id])
-  appointmentId String? @unique
+  id            String     @id @default(cuid())
+  businessId    String
+  business      Business   @relation(fields: [businessId], references: [id])
+  clientId      String
+  client        Client     @relation(fields: [clientId], references: [id])
+  appointmentId String?    @unique
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
-  totalCents Int        @default(0)
-  status     String     @default("draft")
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  items      InvoiceItem[]
-  payment    Payment?
+  totalCents    Int        @default(0)
+  status        String     @default("draft")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  items         InvoiceItem[]
+  payment       Payment?
 }
 
 model InvoiceItem {
@@ -256,6 +284,8 @@ model Discount {
 
 model Survey {
   id            String   @id @default(cuid())
+  businessId    String
+  business      Business @relation(fields: [businessId], references: [id])
   appointmentId String   @unique
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   rating        Int      // 1-5 stars
@@ -270,4 +300,128 @@ model ReviewRequest {
   sentAt        DateTime @default(now())
   clickedAt     DateTime?
   reviewUrl     String?  // Google Business review URL
+}
+
+// Multi-tenant business model
+model Business {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique  // URL-friendly identifier (e.g., "pawsome-pets")
+  email           String?
+  phone           String?
+  website         String?
+  address         String?
+  city            String?
+  state           String?
+  postal          String?
+  
+  // Branding
+  logo            String?   // Logo URL
+  primaryColor    String    @default("#c19a7e")  // Default to our primary color
+  accentColor     String    @default("#d19670")  // Default to our accent color
+  description     String?
+  
+  // Business settings
+  active          Boolean   @default(true)
+  timezone        String    @default("America/New_York")
+  bookingEnabled  Boolean   @default(true)
+  
+  // Social & Marketing
+  facebookUrl     String?
+  instagramUrl    String?
+  googleBusinessId String?
+  
+  // Subscription & Billing
+  stripeCustomerId String?
+  subscriptionId   String?
+  planTier         PlanTier @default(BASIC)
+  subscriptionStatus SubscriptionStatus @default(TRIALING)
+  trialEndsAt      DateTime?
+  subscriptionEndsAt DateTime?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  groomers        Groomer[]
+  clients         Client[]
+  appointments    Appointment[]
+  services        Service[]
+  products        Product[]
+  invoices        Invoice[]
+  photos          Photo[]
+  surveys         Survey[]
+  subscription    Subscription?
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  businessId      String             @unique
+  business        Business           @relation(fields: [businessId], references: [id])
+  
+  stripeSubscriptionId String?        @unique
+  stripePriceId   String?
+  stripeCustomerId String?
+  
+  status          SubscriptionStatus @default(TRIALING)
+  planTier        PlanTier          @default(BASIC)
+  
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  trialStart      DateTime?
+  trialEnd        DateTime?
+  canceledAt      DateTime?
+  
+  // Usage tracking
+  groomersUsed    Int               @default(0)
+  clientsUsed     Int               @default(0)
+  appointmentsThisMonth Int         @default(0)
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  
+  // Relations
+  invoices        SubscriptionInvoice[]
+}
+
+model SubscriptionPlan {
+  id              String    @id @default(cuid())
+  tier            PlanTier  @unique
+  name            String
+  description     String?
+  priceMonthly    Int       // Price in cents
+  priceYearly     Int?      // Price in cents (optional yearly discount)
+  
+  // Limits
+  maxGroomers     Int       @default(-1) // -1 = unlimited
+  maxClients      Int       @default(-1) // -1 = unlimited
+  maxAppointmentsPerMonth Int @default(-1) // -1 = unlimited
+  
+  // Features
+  features        String    // JSON string of feature names
+  
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+  
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model SubscriptionInvoice {
+  id              String       @id @default(cuid())
+  subscriptionId  String
+  subscription    Subscription @relation(fields: [subscriptionId], references: [id])
+  
+  stripeInvoiceId String?      @unique
+  amountPaid      Int          // Amount in cents
+  currency        String       @default("usd")
+  status          String       // paid, open, void, etc
+  
+  billingPeriodStart DateTime
+  billingPeriodEnd   DateTime
+  paidAt          DateTime?
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }

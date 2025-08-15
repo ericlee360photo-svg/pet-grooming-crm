@@ -157,7 +157,7 @@ export class CashAppProvider implements PaymentProvider {
         autocomplete: true,
         external_details: {
           type: "OTHER",
-          source: "Pawfect CRM",
+          source: "BarkBook",
         },
       }),
     });

@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
       const emailHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Thank you for choosing Pawfect CRM!</h2>
+          <h2>Thank you for choosing BarkBook!</h2>
           <p>Hi ${appointment.client.name},</p>
           <p>We hope you and ${appointment.pet.name} had a wonderful grooming experience with ${appointment.groomer.user.name}!</p>
           <p>If you enjoyed our service, we'd be grateful if you could take a moment to leave us a review on Google.</p>
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
           </div>
           <p>Your feedback helps us improve our services and helps other pet owners find us.</p>
           <p>Thank you!</p>
-          <p>The Pawfect CRM Team</p>
+          <p>The BarkBook Team</p>
         </div>
       `;
 

@@ -1,6 +1,6 @@
-# Pawfect CRM - Pet Grooming Business Management System
+# BarkBook - The Complete Grooming Business Platform
 
-A comprehensive CRM solution built with Next.js, TypeScript, and Prisma for pet grooming businesses.
+A comprehensive SaaS platform built with Next.js, TypeScript, and Prisma for pet grooming businesses. Create branded booking pages, manage appointments, and grow your grooming business.
 
 ## Features
 
@@ -184,3 +184,7 @@ MIT License - see LICENSE file for details.
 ---
 
 Built with ❤️ for pet grooming businesses everywhere!
+
+---
+
+**BarkBook** - Where grooming businesses thrive! 🐕📚
