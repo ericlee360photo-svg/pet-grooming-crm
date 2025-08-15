@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     // Send email
     if (process.env.SMTP_HOST) {
-      const transporter = nodemailer.createTransporter({
+      const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT || "587"),
         secure: false,

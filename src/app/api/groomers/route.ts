@@ -1,28 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { searchParams } = new URL(req.url);
+    const businessId = searchParams.get("businessId");
+
+    if (!businessId) {
+      return NextResponse.json(
+        { error: "Business ID is required" },
+        { status: 400 }
+      );
     }
 
     const groomers = await prisma.groomer.findMany({
-      where: { active: true },
-      include: {
-        user: true,
+      where: {
+        businessId,
+        active: true,
       },
-      orderBy: { user: { name: "asc" } },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: {
+            appts: true,
+          },
+        },
+      },
+      orderBy: {
+        user: {
+          name: "asc",
+        },
+      },
     });
 
     return NextResponse.json(groomers);
   } catch (error) {
     console.error("Get groomers error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch groomers" },
+      { error: "Failed to get groomers" },
       { status: 500 }
     );
   }

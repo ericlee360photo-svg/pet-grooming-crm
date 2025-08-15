@@ -137,7 +137,6 @@ export default function Calendar({ groomerId, onEventClick, onDateSelect }: Cale
             meridiem: "short",
           }}
           slotLabelClassNames="text-xs sm:text-sm font-medium text-gray-600"
-          eventClassNames="text-xs sm:text-sm font-medium"
           dayHeaderClassNames="text-xs sm:text-sm font-semibold text-gray-700"
           titleClassNames="text-sm sm:text-base font-bold text-gray-900"
           buttonClassNames="text-xs sm:text-sm font-medium bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-2 sm:px-3 py-1 sm:py-2 rounded"

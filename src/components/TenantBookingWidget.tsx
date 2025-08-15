@@ -143,10 +143,13 @@ export default function TenantBookingWidget({ businessSlug }: TenantBookingWidge
         end: selectedSlot.end,
       };
 
-      const response = await fetch(`/api/business/${businessSlug}/book`, {
+      const response = await fetch(`/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify({
+          ...bookingData,
+          businessSlug, // Add business slug for tenant-specific booking
+        }),
       });
 
       const result = await response.json();

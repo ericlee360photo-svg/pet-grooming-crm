@@ -73,7 +73,7 @@ export default function SurveyForm({ appointmentId, clientName, petName, onSubmi
                     star <= rating ? "text-yellow-400" : "text-gray-300"
                   } hover:text-yellow-400`}
                 >
-                  <Star size={28} sm:size={32} fill={star <= rating ? "currentColor" : "none"} />
+                  <Star size={28} fill={star <= rating ? "currentColor" : "none"} />
                 </button>
               ))}
             </div>

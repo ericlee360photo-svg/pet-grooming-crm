@@ -17,6 +17,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "BarkBook - The Complete Grooming Business Platform",
   description: "Streamline your grooming business with branded booking pages, smart scheduling, and client management. Start your free trial today!",
+  icons: {
+    icon: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+      {
+        url: "/favicon.ico",
+        sizes: "any",
+      },
+    ],
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

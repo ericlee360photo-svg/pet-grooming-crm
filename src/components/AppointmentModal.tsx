@@ -58,10 +58,13 @@ export default function AppointmentModal({
 
   const fetchData = async () => {
     try {
+      // Get business ID from session or context (you might need to pass this as a prop)
+      const businessId = "default-business-id"; // This should come from context or props
+      
       const [clientsRes, groomersRes, servicesRes] = await Promise.all([
-        fetch("/api/clients"),
-        fetch("/api/groomers"),
-        fetch("/api/services"),
+        fetch(`/api/clients?businessId=${businessId}`),
+        fetch(`/api/groomers?businessId=${businessId}`),
+        fetch(`/api/services?businessId=${businessId}`),
       ]);
 
       setClients(await clientsRes.json());
