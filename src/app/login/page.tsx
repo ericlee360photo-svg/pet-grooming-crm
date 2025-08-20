@@ -8,6 +8,8 @@ import { Logo } from "@/components/ui/logo"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
+import { OAuthButtons, OAuthDivider } from "@/components/ui/oauth-buttons"
+import { signInWithEmail } from "@/lib/auth"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -55,20 +57,32 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // TODO: Implement actual login logic with Supabase
-      console.log('Login data:', formData)
+      const { user, error } = await signInWithEmail(formData.email, formData.password)
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // Redirect to dashboard
-      router.push('/dashboard')
+      if (error) {
+        setErrors({ general: error.message })
+        return
+      }
+
+      if (user) {
+        // Redirect to dashboard
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('Login error:', error)
       setErrors({ general: 'Invalid email or password. Please try again.' })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleOAuthSuccess = () => {
+    // OAuth redirect will handle the flow
+    // User will be redirected to /auth/callback
+  }
+
+  const handleOAuthError = (error: string) => {
+    setErrors({ general: error })
   }
 
   return (
@@ -90,6 +104,15 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* OAuth Buttons */}
+            <OAuthButtons 
+              onSuccess={handleOAuthSuccess}
+              onError={handleOAuthError}
+              className="mb-6"
+            />
+            
+            <OAuthDivider className="mb-6" />
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">

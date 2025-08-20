@@ -8,6 +8,8 @@ import { Logo } from "@/components/ui/logo"
 import { Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from 'next/navigation'
+import { OAuthButtons, OAuthDivider } from "@/components/ui/oauth-buttons"
+import { signUpWithEmail } from "@/lib/auth"
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -81,20 +83,40 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      // TODO: Implement actual signup logic with Supabase
-      console.log('Signup data:', formData)
+      const { user, error } = await signUpWithEmail(
+        formData.email,
+        formData.password,
+        {
+          business_name: formData.businessName,
+          owner_name: formData.ownerName,
+          phone: formData.phone,
+        }
+      )
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Redirect to onboarding
-      router.push('/onboarding')
+      if (error) {
+        setErrors({ general: error.message })
+        return
+      }
+
+      if (user) {
+        // Redirect to dashboard or onboarding
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('Signup error:', error)
       setErrors({ general: 'An error occurred during signup. Please try again.' })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleOAuthSuccess = () => {
+    // OAuth redirect will handle the flow
+    // User will be redirected to /auth/callback
+  }
+
+  const handleOAuthError = (error: string) => {
+    setErrors({ general: error })
   }
 
   const formatPhone = (value: string) => {
@@ -125,6 +147,15 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* OAuth Buttons */}
+            <OAuthButtons 
+              onSuccess={handleOAuthSuccess}
+              onError={handleOAuthError}
+              className="mb-6"
+            />
+            
+            <OAuthDivider className="mb-6" />
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Business Information */}
               <div className="space-y-4">
