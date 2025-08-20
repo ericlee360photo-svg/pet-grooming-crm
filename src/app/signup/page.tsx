@@ -318,6 +318,11 @@ export default function SignupPage() {
                 <Link href="/privacy" className="text-accent hover:underline">
                   Privacy Policy
                 </Link>
+                . View our{' '}
+                <Link href="/refund" className="text-accent hover:underline">
+                  Refund Policy
+                </Link>
+                .
               </p>
             </form>
           </CardContent>
