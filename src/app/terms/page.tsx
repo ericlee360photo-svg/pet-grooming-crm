@@ -1,4 +1,3 @@
-import { Logo } from "@/components/ui/logo"
 import Link from "next/link"
 
 export default function TermsPage() {
@@ -9,7 +8,7 @@ export default function TermsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
-              <Logo size="lg" />
+              <span className="text-2xl font-bold text-primary">BarkBook</span>
             </Link>
             <Link href="/" className="text-accent hover:underline">
               Back to Home

@@ -1,0 +1,32 @@
+{
+  "name": "BarkBook - Pet Grooming CRM",
+  "short_name": "BarkBook",
+  "description": "The complete CRM solution for professional pet groomers",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#f8eee4",
+  "theme_color": "#19253d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "screenshots": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ]
+}

@@ -9,11 +9,13 @@ export const metadata: Metadata = {
   description: "The complete CRM solution for professional pet groomers. Manage appointments, clients, and your business with ease.",
   keywords: "pet grooming, CRM, appointment booking, pet salon, grooming business",
   authors: [{ name: "BarkBook Team" }],
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
   },
+  manifest: '/manifest.json',
   openGraph: {
     title: "BarkBook - Professional Pet Grooming CRM",
     description: "The complete CRM solution for professional pet groomers.",
