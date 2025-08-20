@@ -18,7 +18,7 @@ import {
 import { dateUtils, currencyUtils } from "@/lib/utils"
 
 export default function DashboardPage() {
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [selectedDate] = useState(new Date())
 
   // Mock data for demonstration
   const dashboardData = {
@@ -102,7 +102,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today's Appointments</CardTitle>
+              <CardTitle className="text-sm font-medium">Today&apos;s Appointments</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Today's Schedule</CardTitle>
+                    <CardTitle>Today&apos;s Schedule</CardTitle>
                     <CardDescription>
                       Upcoming appointments for {dateUtils.formatDate(selectedDate, 'EEEE, MMMM dd')}
                     </CardDescription>
