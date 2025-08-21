@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   description: "The complete CRM solution for professional pet groomers. Manage appointments, clients, and your business with ease.",
   keywords: "pet grooming, CRM, appointment booking, pet salon, grooming business",
   authors: [{ name: "BarkBook Team" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1",
   // Icons are auto-detected from src/app/ directory
   // icon.svg and favicon.ico are automatically used
   manifest: '/manifest.json',
@@ -25,6 +24,12 @@ export const metadata: Metadata = {
     title: "BarkBook - Professional Pet Grooming CRM",
     description: "The complete CRM solution for professional pet groomers.",
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({

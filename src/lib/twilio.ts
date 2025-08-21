@@ -79,22 +79,22 @@ export const sendMMS = async ({ to, body, mediaUrl, from = phoneNumber }: SendMM
 // Message templates
 export const messageTemplates = {
   appointmentConfirmation: (appointment: Record<string, unknown>, pets: Record<string, unknown>[]) => {
-    const petNames = pets.map(pet => pet.name).join(', ')
-    return `Your appointment for ${petNames} has been confirmed for ${new Date(appointment.start_at).toLocaleString()}. Please arrive 5 minutes early. Reply STOP to unsubscribe.`
+    const petNames = pets.map(pet => (pet as { name: string }).name).join(', ')
+    return `Your appointment for ${petNames} has been confirmed for ${new Date(appointment.start_at as string).toLocaleString()}. Please arrive 5 minutes early. Reply STOP to unsubscribe.`
   },
   
   appointmentReminder: (appointment: Record<string, unknown>, pets: Record<string, unknown>[]) => {
-    const petNames = pets.map(pet => pet.name).join(', ')
-    return `Reminder: Your appointment for ${petNames} is tomorrow at ${new Date(appointment.start_at).toLocaleTimeString()}. Please confirm by replying YES or cancel by replying NO.`
+    const petNames = pets.map(pet => (pet as { name: string }).name).join(', ')
+    return `Reminder: Your appointment for ${petNames} is tomorrow at ${new Date(appointment.start_at as string).toLocaleTimeString()}. Please confirm by replying YES or cancel by replying NO.`
   },
   
   appointmentCancelled: (appointment: Record<string, unknown>, pets: Record<string, unknown>[]) => {
-    const petNames = pets.map(pet => pet.name).join(', ')
-    return `Your appointment for ${petNames} on ${new Date(appointment.start_at).toLocaleDateString()} has been cancelled. Please contact us to reschedule.`
+    const petNames = pets.map(pet => (pet as { name: string }).name).join(', ')
+    return `Your appointment for ${petNames} on ${new Date(appointment.start_at as string).toLocaleDateString()} has been cancelled. Please contact us to reschedule.`
   },
   
   vaccineReminder: (pet: Record<string, unknown>, vaccine: Record<string, unknown>) => {
-    return `Reminder: ${pet.name}'s ${vaccine.name} vaccine expires on ${new Date(vaccine.expires_on).toLocaleDateString()}. Please upload updated records or contact us.`
+    return `Reminder: ${(pet as { name: string }).name}'s ${(vaccine as { name: string }).name} vaccine expires on ${new Date((vaccine as { expires_on: string }).expires_on).toLocaleDateString()}. Please upload updated records or contact us.`
   },
   
   etaUpdate: (eta: string, location: string) => {

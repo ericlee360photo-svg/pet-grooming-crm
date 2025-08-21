@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { createBrowserClient, createServerClient } from '@supabase/ssr'
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
@@ -18,7 +18,8 @@ export const createServerSupabaseClient = () => {
     throw new Error('Missing Supabase environment variables')
   }
   
-  return createServerClient(url, serviceKey, {
+  // For API routes, use the regular createClient instead of SSR version
+  return createClient(url, serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
