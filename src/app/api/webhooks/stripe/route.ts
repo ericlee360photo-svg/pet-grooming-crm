@@ -1,37 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import Stripe from 'stripe'
-import { stripe } from '@/lib/stripe'
 
 // Make this route dynamic
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
-  const body = await req.text()
-  const signature = headers().get('stripe-signature')
-  
-  if (!signature) {
-    return NextResponse.json(
-      { error: 'Missing stripe-signature header' },
-      { status: 400 }
-    )
-  }
-
-  let event: Stripe.Event
-
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    )
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err)
-    return NextResponse.json(
-      { error: 'Webhook signature verification failed' },
-      { status: 400 }
-    )
-  }
+    // Check environment variables first
+    if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+      return NextResponse.json(
+        { error: 'Stripe configuration incomplete' },
+        { status: 500 }
+      )
+    }
+
+    // Create Stripe client dynamically
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-07-30.basil',
+    })
+
+    const body = await req.text()
+    const headersList = await headers()
+    const signature = headersList.get('stripe-signature')
+    
+    if (!signature) {
+      return NextResponse.json(
+        { error: 'Missing stripe-signature header' },
+        { status: 400 }
+      )
+    }
+
+    let event: Stripe.Event
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET
+      )
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err)
+      return NextResponse.json(
+        { error: 'Webhook signature verification failed' },
+        { status: 400 }
+      )
+    }
 
   // Handle the event
   try {
@@ -109,6 +123,14 @@ export async function POST(req: NextRequest) {
     console.error('Error processing webhook:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+  
+  } catch (error) {
+    console.error('Webhook route error:', error)
+    return NextResponse.json(
+      { error: 'Webhook processing failed' },
       { status: 500 }
     )
   }

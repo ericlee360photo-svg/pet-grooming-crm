@@ -10,11 +10,8 @@ export const metadata: Metadata = {
   keywords: "pet grooming, CRM, appointment booking, pet salon, grooming business",
   authors: [{ name: "BarkBook Team" }],
   viewport: "width=device-width, initial-scale=1, maximum-scale=1",
-  icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
-  },
+  // Icons are auto-detected from src/app/ directory
+  // icon.svg and favicon.ico are automatically used
   manifest: '/manifest.json',
   openGraph: {
     title: "BarkBook - Professional Pet Grooming CRM",
