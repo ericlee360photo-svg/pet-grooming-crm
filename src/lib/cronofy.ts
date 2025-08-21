@@ -112,15 +112,15 @@ export class CalendarService {
 // Calendar sync utilities
 export const calendarUtils = {
   // Convert appointment to calendar event
-  appointmentToEvent: (appointment: any, pets: any[], owner: any) => {
-    const petNames = pets.map(pet => pet.name).join(', ')
+  appointmentToEvent: (appointment: Record<string, unknown>, pets: Record<string, unknown>[], owner: Record<string, unknown>) => {
+    const petNames = pets.map(pet => (pet as { name: string }).name).join(', ')
     return {
       summary: `Grooming: ${petNames}`,
-      description: `Appointment for ${petNames} with ${owner.name}`,
-      start: new Date(appointment.start_at),
-      end: new Date(appointment.end_at),
-      location: appointment.location?.address || 'Grooming Salon',
-      attendees: [owner.email].filter(Boolean),
+      description: `Appointment for ${petNames} with ${(owner as { name: string }).name}`,
+      start: new Date(appointment.start_at as string),
+      end: new Date(appointment.end_at as string),
+      location: (appointment.location as { address?: string })?.address || 'Grooming Salon',
+      attendees: [(owner as { email?: string }).email].filter(Boolean),
     }
   },
 

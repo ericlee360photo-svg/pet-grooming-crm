@@ -95,7 +95,7 @@ export type Database = {
           name: string
           email: string | null
           phone: string | null
-          address: any | null
+          address: Record<string, unknown> | null
           notes: string | null
           risk_level: number
           created_at: string
@@ -106,7 +106,7 @@ export type Database = {
           name: string
           email?: string | null
           phone?: string | null
-          address?: any | null
+          address?: Record<string, unknown> | null
           notes?: string | null
           risk_level?: number
           created_at?: string
@@ -117,7 +117,7 @@ export type Database = {
           name?: string
           email?: string | null
           phone?: string | null
-          address?: any | null
+          address?: Record<string, unknown> | null
           notes?: string | null
           risk_level?: number
           created_at?: string

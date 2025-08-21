@@ -26,7 +26,7 @@ import { dateUtils, currencyUtils } from "@/lib/utils"
 import Link from "next/link"
 
 export default function DashboardPage() {
-  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [selectedDate] = useState(new Date())
   const [isInstalling, setIsInstalling] = useState(false)
 
   // Function to handle PWA installation
@@ -46,17 +46,17 @@ export default function DashboardPage() {
         if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
           instructions = `To install BarkBook on your iPhone/iPad:
 1. Tap the Share button in Safari
-2. Scroll down and tap "Add to Home Screen"
-3. Tap "Add" to confirm`
+2. Scroll down and tap &quot;Add to Home Screen&quot;
+3. Tap &quot;Add&quot; to confirm`
         } else if (userAgent.includes('android')) {
           instructions = `To install BarkBook on your Android device:
 1. Tap the menu (three dots) in your browser
-2. Select "Add to Home screen" or "Install app"
-3. Tap "Add" or "Install" to confirm`
+2. Select &quot;Add to Home screen&quot; or &quot;Install app&quot;
+3. Tap &quot;Add&quot; or &quot;Install&quot; to confirm`
         } else {
           instructions = `To install BarkBook on your device:
-1. Look for the install icon in your browser's address bar
-2. Click "Install" when prompted
+1. Look for the install icon in your browser&apos;s address bar
+2. Click &quot;Install&quot; when prompted
 3. The app will be added to your device`
         }
         

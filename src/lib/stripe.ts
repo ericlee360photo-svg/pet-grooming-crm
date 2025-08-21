@@ -21,7 +21,7 @@ export type StripeWebhookEvent = {
   api_version: string
   created: number
   data: {
-    object: any
+    object: Record<string, unknown>
   }
   livemode: boolean
   pending_webhooks: number
