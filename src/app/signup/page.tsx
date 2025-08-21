@@ -1,6 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+// Force dynamic rendering to avoid SSR issues with Supabase
+export const dynamic = 'force-dynamic'
+
+import { useState, Suspense } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -11,7 +14,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { OAuthButtons, OAuthDivider } from "@/components/ui/oauth-buttons"
 import { signUpWithEmail } from "@/lib/auth"
 
-export default function SignupPage() {
+function SignupContent() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -339,5 +342,13 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <SignupContent />
+    </Suspense>
   )
 }

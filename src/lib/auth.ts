@@ -14,10 +14,19 @@ export interface UserProfile {
   avatar_url?: string
 }
 
+// Helper to check if Supabase is available
+const ensureSupabase = () => {
+  if (!supabase) {
+    throw new Error('Supabase client not initialized')
+  }
+  return supabase
+}
+
 // Google OAuth Sign In
 export const signInWithGoogle = async (): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const client = ensureSupabase()
+    const { data, error } = await client.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -44,7 +53,8 @@ export const signInWithGoogle = async (): Promise<{ user: UserProfile | null; er
 // Apple OAuth Sign In
 export const signInWithApple = async (): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
   try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const client = ensureSupabase()
+    const { data, error } = await client.auth.signInWithOAuth({
       provider: 'apple',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
@@ -75,7 +85,8 @@ export const signUpWithEmail = async (
   }
 ): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const client = ensureSupabase()
+    const { data, error } = await client.auth.signUp({
       email,
       password,
       options: {
@@ -121,7 +132,8 @@ export const signInWithEmail = async (
   password: string
 ): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const client = ensureSupabase()
+    const { data, error } = await client.auth.signInWithPassword({
       email,
       password,
     })
@@ -156,7 +168,8 @@ export const signInWithEmail = async (
 // Sign Out
 export const signOut = async (): Promise<{ error: AuthError | null }> => {
   try {
-    const { error } = await supabase.auth.signOut()
+    const client = ensureSupabase()
+    const { error } = await client.auth.signOut()
     
     if (error) {
       return { error: { message: error.message } }
@@ -171,7 +184,8 @@ export const signOut = async (): Promise<{ error: AuthError | null }> => {
 // Get Current User
 export const getCurrentUser = async (): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const client = ensureSupabase()
+    const { data: { user }, error } = await client.auth.getUser()
     
     if (error) {
       return { user: null, error: { message: error.message } }
@@ -202,6 +216,7 @@ export const getCurrentUser = async (): Promise<{ user: UserProfile | null; erro
 
 // Listen to auth state changes
 export const onAuthStateChange = (callback: (user: UserProfile | null) => void) => {
+  if (!supabase) return { data: { subscription: null }, error: null }
   return supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user) {
       const user: UserProfile = {
@@ -217,4 +232,32 @@ export const onAuthStateChange = (callback: (user: UserProfile | null) => void) 
       callback(null)
     }
   })
+}
+
+// Server-side auth helper for API routes
+export const auth = async () => {
+  const { createServerClient } = await import('./supabase')
+  const supabaseServer = createServerClient()
+  
+  try {
+    const { data: { user }, error } = await supabaseServer.auth.getUser()
+    
+    if (error || !user) {
+      return null
+    }
+    
+    return {
+      user: {
+        id: user.id,
+        email: user.email!,
+        name: user.user_metadata?.owner_name || user.user_metadata?.name,
+        phone: user.user_metadata?.phone,
+        business_name: user.user_metadata?.business_name,
+        avatar_url: user.user_metadata?.avatar_url,
+      }
+    }
+  } catch (error) {
+    console.error('Auth error:', error)
+    return null
+  }
 }

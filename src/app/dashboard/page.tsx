@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering for dashboard
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,9 +19,11 @@ import {
   Filter,
   Smartphone,
   Download,
-  Share
+  Share,
+  Upload
 } from "lucide-react"
 import { dateUtils, currencyUtils } from "@/lib/utils"
+import Link from "next/link"
 
 export default function DashboardPage() {
   const [selectedDate] = useState(new Date())
@@ -349,6 +354,13 @@ export default function DashboardPage() {
                   <Search className="h-4 w-4 mr-2" />
                   Search Records
                 </Button>
+                
+                <Link href="/dashboard/migrate">
+                  <Button className="w-full justify-start" variant="outline">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import Client Data
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 

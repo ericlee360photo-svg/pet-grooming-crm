@@ -1,11 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Logo } from '@/components/ui/logo'
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -14,6 +17,11 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        if (!supabase) {
+          setError('Authentication service not available')
+          return
+        }
+        
         const { data, error } = await supabase.auth.getSession()
         
         if (error) {
@@ -72,5 +80,13 @@ export default function AuthCallbackPage() {
         <p className="mt-4 text-gray-600">Completing authentication...</p>
       </div>
     </div>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <AuthCallbackContent />
+    </Suspense>
   )
 }
