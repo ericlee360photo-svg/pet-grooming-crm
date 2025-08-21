@@ -26,7 +26,7 @@ import { dateUtils, currencyUtils } from "@/lib/utils"
 import Link from "next/link"
 
 export default function DashboardPage() {
-  const [selectedDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(new Date())
   const [isInstalling, setIsInstalling] = useState(false)
 
   // Function to handle PWA installation
