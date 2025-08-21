@@ -236,8 +236,8 @@ export const onAuthStateChange = (callback: (user: UserProfile | null) => void) 
 
 // Server-side auth helper for API routes
 export const auth = async () => {
-  const { createServerClient } = await import('./supabase')
-  const supabaseServer = createServerClient()
+  const { createServerSupabaseClient } = await import('./supabase')
+  const supabaseServer = createServerSupabaseClient()
   
   try {
     const { data: { user }, error } = await supabaseServer.auth.getUser()

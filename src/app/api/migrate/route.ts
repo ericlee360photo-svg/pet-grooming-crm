@@ -56,8 +56,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Import and create server client dynamically
-    const { createServerClient } = await import('@/lib/supabase')
-    const supabase = createServerClient()
+    const { createServerSupabaseClient } = await import('@/lib/supabase')
+    const supabase = createServerSupabaseClient()
     
     // For demo purposes, we'll use a default organization
     // In production, you'd get this from the authenticated user

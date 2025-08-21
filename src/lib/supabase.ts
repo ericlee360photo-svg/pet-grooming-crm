@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { createBrowserClient } from '@supabase/ssr'
+import { createBrowserClient, createServerClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
@@ -10,7 +10,7 @@ export const supabase = typeof window !== 'undefined'
   : null
 
 // Server-side Supabase client (with service role key)
-export const createServerClient = () => {
+export const createServerSupabaseClient = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   
@@ -18,13 +18,16 @@ export const createServerClient = () => {
     throw new Error('Missing Supabase environment variables')
   }
   
-  return createClient(url, serviceKey, {
+  return createServerClient(url, serviceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
     }
   })
 }
+
+// Legacy export for backward compatibility
+export const createServerClient = createServerSupabaseClient
 
 // Export createClient for API routes
 export { createClient }
