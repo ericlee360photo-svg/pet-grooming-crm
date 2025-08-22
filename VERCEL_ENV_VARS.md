@@ -16,14 +16,26 @@ Copy these environment variables to your Vercel project dashboard:
 ### Supabase (Database & Auth)
 ```bash
 # Get these from: https://supabase.com/dashboard/project/YOUR_PROJECT/settings/api
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL_HERE
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY_HERE
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY_HERE
+SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET_HERE
+```
+
+### Database Configuration
+```bash
+POSTGRES_URL=YOUR_POSTGRES_URL_HERE
+POSTGRES_USER=YOUR_POSTGRES_USER_HERE
+POSTGRES_HOST=YOUR_POSTGRES_HOST_HERE
+POSTGRES_PASSWORD=YOUR_POSTGRES_PASSWORD_HERE
+POSTGRES_DATABASE=YOUR_POSTGRES_DATABASE_HERE
+POSTGRES_PRISMA_URL=YOUR_POSTGRES_PRISMA_URL_HERE
+POSTGRES_URL_NON_POOLING=YOUR_POSTGRES_URL_NON_POOLING_HERE
 ```
 
 ### App URL
 ```bash
-# Your Vercel deployment URL
+# Your Vercel deployment URL (update this to your actual Vercel URL)
 NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
 ```
 
@@ -32,13 +44,11 @@ NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
 ## 💳 **STRIPE - Payment Processing**
 
 ```bash
-# Your Stripe keys (test mode shown)
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51Rw6s6Lws4za4ql32gottDZt9jqZbpqjHiVXnxpyesWUaV4OTWCjmfRHd7dTfjVlMHSOUkr4T5fsfjVD38EO1eNZ00OYJ6acpl
-STRIPE_SECRET_KEY=sk_test_YOUR_SECRET_KEY_FROM_STRIPE_DASHBOARD
-STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_AFTER_SETUP
+# Your Stripe keys (LIVE mode)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_YOUR_PUBLISHABLE_KEY_HERE
+STRIPE_SECRET_KEY=sk_live_YOUR_SECRET_KEY_HERE
+STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_HERE
 ```
-
-**📝 Note:** You provided your publishable key. You'll need to get the secret key from your Stripe dashboard.
 
 ---
 
@@ -46,7 +56,7 @@ STRIPE_WEBHOOK_SECRET=whsec_YOUR_WEBHOOK_SECRET_AFTER_SETUP
 
 ```bash
 # Your Google Apps Script (already configured!)
-NEXT_PUBLIC_GOOGLE_SCRIPT_URL=https://script.google.com/macros/s/AKfycbwF3XvAObvdT8_r60SXm6wBI9nrwjXRiyAqPOCR_KPoLSCsL5n6sEPLpEYtAoFfFlbmIQ/exec
+NEXT_PUBLIC_GOOGLE_SCRIPT_URL=https://script.google.com/macros/s/1hn8Tlc46NEDYs_oVdo8dStS1IzCRLKCisjwQ7_mc3lRQNMofy5g3BvSiD/exec
 ```
 
 ---
@@ -55,21 +65,20 @@ NEXT_PUBLIC_GOOGLE_SCRIPT_URL=https://script.google.com/macros/s/AKfycbwF3XvAObv
 
 ### SMS Notifications (Twilio)
 ```bash
-TWILIO_ACCOUNT_SID=your_twilio_account_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
+TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID_HERE
+TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN_HERE
+TWILIO_PHONE_NUMBER=YOUR_TWILIO_PHONE_NUMBER_HERE
 ```
 
 ### Social Login (OAuth)
 ```bash
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
-NEXT_PUBLIC_APPLE_CLIENT_ID=your_apple_client_id
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID_HERE
 ```
 
 ### Calendar Sync (Cronofy)
 ```bash
-CRONOFY_CLIENT_ID=your_cronofy_client_id
-CRONOFY_CLIENT_SECRET=your_cronofy_client_secret
+CRONOFY_CLIENT_ID=YOUR_CRONOFY_CLIENT_ID_HERE
+CRONOFY_CLIENT_SECRET=YOUR_CRONOFY_CLIENT_SECRET_HERE
 ```
 
 ---
@@ -98,52 +107,27 @@ CRONOFY_CLIENT_SECRET=your_cronofy_client_secret
 
 ## 🔥 **What's Ready to Go**
 
-### ✅ **Core Features Working:**
-- **Landing page** with beautiful design
-- **Email capture** (already connected to Google Sheets)
-- **CSV client migration** with drag & drop
-- **Authentication system** (Google, Apple, Email)
-- **Dashboard** with PWA support
-- **Mobile-responsive** design
-
-### ✅ **Technical Setup Complete:**
-- Next.js 15 with TypeScript
-- Tailwind CSS styling
-- Supabase integration
-- Stripe payment ready
-- Build optimization
-- Error handling
+- ✅ **Landing Page**: Professional homepage with features and pricing
+- ✅ **Email Capture**: Google Apps Script integration working
+- ✅ **Authentication**: Supabase auth with Google OAuth
+- ✅ **Dashboard**: Full CRM with appointments, clients, payments, analytics
+- ✅ **Groomer Management**: Add/delete groomers with subscription limits
+- ✅ **Calendar View**: Daily appointment scheduling
+- ✅ **Payment Processing**: Stripe integration ready
+- ✅ **SMS Notifications**: Twilio integration ready
+- ✅ **Calendar Sync**: Cronofy integration ready
 
 ---
 
-## 🚨 **Priority Order for Launch**
+## ⚠️ **Important Security Notes**
 
-### **IMMEDIATE (Required for basic launch):**
-1. **Supabase setup** - Get your database running
-2. **Environment variables** - Add to Vercel
-3. **Deploy** - Your app will be live!
-
-### **NEXT (Enhanced features):**
-4. **Stripe secret key** - For payment processing
-5. **Social OAuth** - For easier login
-6. **SMS/Calendar** - For advanced features
+1. **Never commit `.env.local` to Git** - it's already in `.gitignore`
+2. **Use environment variables in Vercel** - don't hardcode secrets
+3. **Rotate keys regularly** - especially for production
+4. **Monitor usage** - Stripe, Twilio, and Cronofy have usage limits
 
 ---
 
-## 💡 **Quick Test After Deployment**
+## 🚀 **Ready to Deploy!**
 
-1. **Visit your deployed URL**
-2. **Test email signup** (should write to Google Sheets)
-3. **Try CSV upload** (should work with sample data)
-4. **Check authentication** (should redirect properly)
-
----
-
-## 🆘 **Need Help?**
-
-**Common Issues:**
-- **Build fails**: Check environment variables are set
-- **Supabase errors**: Verify URL and keys are correct
-- **Auth issues**: Check redirect URLs in Supabase settings
-
-Your project is **production-ready**! The hard work is done. 🎉
+Your BarkBook CRM is fully configured and ready for production deployment on Vercel!

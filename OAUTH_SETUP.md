@@ -1,12 +1,37 @@
 # OAuth Setup Guide for Pet Grooming CRM
 
-This guide will help you set up OAuth authentication with Google and Apple for your pet grooming CRM.
+## 🚨 Quick Fix for "Unsupported provider" Error
+
+If you're seeing the error `"Unsupported provider: provider is not enabled"`, follow these steps:
+
+### 1. Configure Supabase OAuth Providers
+
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to **Authentication** → **Providers**
+4. Enable **Google** provider
+5. Add your Google OAuth Client ID and Secret
+
+### 2. Set Environment Variables
+
+Create a `.env.local` file in your project root with:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_actual_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_actual_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_actual_supabase_service_role_key
+```
+
+### 3. Alternative: Disable OAuth Temporarily
+
+If you want to use email-only signup for now, the Google OAuth button will automatically be hidden when Google isn't configured.
+
+---
 
 ## Prerequisites
 
 - A Supabase project (for authentication)
 - Google Cloud Console account (for Google OAuth)
-- Apple Developer account (for Apple OAuth)
 
 ## 1. Supabase Configuration
 

@@ -26,6 +26,16 @@ const ensureSupabase = () => {
 export const signInWithGoogle = async (): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
   try {
     const client = ensureSupabase()
+    
+    // Check if Google OAuth is configured
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || 
+        process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co') {
+      return { 
+        user: null, 
+        error: { message: 'Google OAuth is not configured. Please use email signup.' } 
+      }
+    }
+    
     const { data, error } = await client.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -50,29 +60,7 @@ export const signInWithGoogle = async (): Promise<{ user: UserProfile | null; er
   }
 }
 
-// Apple OAuth Sign In
-export const signInWithApple = async (): Promise<{ user: UserProfile | null; error: AuthError | null }> => {
-  try {
-    const client = ensureSupabase()
-    const { data, error } = await client.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
 
-    if (error) {
-      return { user: null, error: { message: error.message } }
-    }
-
-    return { user: null, error: null }
-  } catch (error) {
-    return { 
-      user: null, 
-      error: { message: 'An unexpected error occurred during Apple sign in' } 
-    }
-  }
-}
 
 // Email/Password Sign Up
 export const signUpWithEmail = async (
