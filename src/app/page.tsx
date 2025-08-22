@@ -72,7 +72,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
+      <header className="border-b border-coral-200 bg-coral-500 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
@@ -83,22 +83,22 @@ export default function Home() {
                   className="w-full h-full object-contain"
                 />
               </div>
-              <span className="text-2xl font-bold text-navy">BarkBook</span>
+              <span className="text-2xl font-bold text-white">BarkBook</span>
             </Link>
             <nav className="hidden md:flex items-center space-x-8">
               <button 
                 onClick={() => scrollToSection('features')}
-                className="text-gray-600 hover:text-coral-500 transition-colors font-medium"
+                className="text-white hover:text-coral-100 transition-colors font-medium"
               >
                 Features
               </button>
               <button 
                 onClick={() => scrollToSection('pricing')}
-                className="text-gray-600 hover:text-coral-500 transition-colors font-medium"
+                className="text-white hover:text-coral-100 transition-colors font-medium"
               >
                 Pricing
               </button>
-              <Link href="/login" className="text-gray-600 hover:text-coral-500 transition-colors font-medium">
+              <Link href="/login" className="text-white hover:text-coral-100 transition-colors font-medium">
                 Login
               </Link>
             </nav>
@@ -473,7 +473,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-navy text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             {/* Company Info */}
@@ -536,7 +536,7 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+          <div className="border-t border-navy-800 pt-8 text-center text-gray-400">
             <p>&copy; {new Date().getFullYear()} BarkBook. All rights reserved.</p>
           </div>
         </div>
