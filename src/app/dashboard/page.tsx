@@ -191,17 +191,21 @@ export default function Dashboard() {
 
   const generateCalendarEvent = (type: 'vaccine' | 'visit', client: any) => {
     const now = new Date()
+    // Use the first dog's data for the calendar event
+    const dog = client.dogs[0]
+    if (!dog) return ''
+    
     const eventDate = type === 'vaccine' 
-      ? new Date(client.vaccineExpiration)
-      : new Date(client.nextRecommendedVisit)
+      ? new Date(dog.vaccineExpiration)
+      : new Date(dog.nextRecommendedVisit)
     
     const eventTitle = type === 'vaccine' 
-      ? `Vaccine Due - ${client.dogName}`
-      : `Grooming Appointment - ${client.dogName}`
+      ? `Vaccine Due - ${dog.name}`
+      : `Grooming Appointment - ${dog.name}`
     
     const eventDescription = type === 'vaccine'
-      ? `${client.dogName}'s vaccines are due for renewal. Please contact BarkBook to schedule an appointment.`
-      : `Time for ${client.dogName}'s regular grooming appointment. Recommended every ${client.recommendedFrequency} weeks.`
+      ? `${dog.name}'s vaccines are due for renewal. Please contact BarkBook to schedule an appointment.`
+      : `Time for ${dog.name}'s regular grooming appointment. Recommended every ${dog.recommendedFrequency} weeks.`
     
     // Generate .ics file content
     const icsContent = [
@@ -229,7 +233,10 @@ export default function Dashboard() {
 
   const handleSendCalendarInvite = (clientId: number, clientName: string, type: 'vaccine' | 'visit') => {
     const client = mockClients.find(c => c.id === clientId)
-    if (!client) return
+    if (!client || client.dogs.length === 0) return
+    
+    // Use the first dog's name for the filename, or client name if no dogs
+    const dogName = client.dogs[0]?.name || client.ownerName
     
     const icsContent = generateCalendarEvent(type, client)
     const blob = new Blob([icsContent], { type: 'text/calendar' })
@@ -237,7 +244,7 @@ export default function Dashboard() {
     
     const link = document.createElement('a')
     link.href = url
-    link.download = `${client.dogName}-${type}-reminder.ics`
+    link.download = `${dogName}-${type}-reminder.ics`
     link.click()
     
     URL.revokeObjectURL(url)
@@ -885,8 +892,12 @@ export default function Dashboard() {
                  <div className="p-6">
                    <div className="grid grid-cols-1 gap-4">
                      {mockClients.map((client) => {
-                       const vaccineExpirationDate = new Date(client.vaccineExpiration)
-                       const nextVisitDate = new Date(client.nextRecommendedVisit)
+                       // Get the first dog for display purposes
+                       const primaryDog = client.dogs[0]
+                       if (!primaryDog) return null
+                       
+                       const vaccineExpirationDate = new Date(primaryDog.vaccineExpiration)
+                       const nextVisitDate = new Date(primaryDog.nextRecommendedVisit)
                        const today = new Date()
                        const daysUntilVaccineExpiry = Math.ceil((vaccineExpirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
                        const daysUntilNextVisit = Math.ceil((nextVisitDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
@@ -898,13 +909,16 @@ export default function Dashboard() {
                                <div className="flex items-center space-x-3 mb-3">
                                  <div className="h-12 w-12 bg-primary rounded-full flex items-center justify-center">
                                    <span className="text-white font-medium text-lg">
-                                     {client.dogName.charAt(0)}
+                                     {primaryDog.name.charAt(0)}
                                    </span>
                                  </div>
                                  <div>
-                                   <h3 className="text-lg font-semibold text-gray-900">{client.dogName}</h3>
-                                   <p className="text-sm text-gray-500">{client.ownerName} • {client.breed}</p>
-                                   <p className="text-xs text-gray-400">{client.age} years old</p>
+                                   <h3 className="text-lg font-semibold text-gray-900">{primaryDog.name}</h3>
+                                   <p className="text-sm text-gray-500">{client.ownerName} • {primaryDog.breed}</p>
+                                   <p className="text-xs text-gray-400">{primaryDog.age} years old</p>
+                                   {client.dogs.length > 1 && (
+                                     <p className="text-xs text-blue-600 font-medium">+{client.dogs.length - 1} more dogs</p>
+                                   )}
                                  </div>
                                </div>
                                
@@ -916,7 +930,7 @@ export default function Dashboard() {
                                  </div>
                                  <div>
                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Vaccinations</p>
-                                   <p className="text-sm text-gray-900">Expires: {new Date(client.vaccineExpiration).toLocaleDateString()}</p>
+                                   <p className="text-sm text-gray-900">Expires: {new Date(primaryDog.vaccineExpiration).toLocaleDateString()}</p>
                                    <p className={`text-xs ${daysUntilVaccineExpiry <= 30 ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
                                      {daysUntilVaccineExpiry > 0 ? `${daysUntilVaccineExpiry} days left` : 'Expired'}
                                    </p>
@@ -926,7 +940,7 @@ export default function Dashboard() {
                                  </div>
                                  <div>
                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Next Visit</p>
-                                   <p className="text-sm text-gray-900">{new Date(client.nextRecommendedVisit).toLocaleDateString()}</p>
+                                   <p className="text-sm text-gray-900">{new Date(primaryDog.nextRecommendedVisit).toLocaleDateString()}</p>
                                    <p className={`text-xs ${daysUntilNextVisit <= 7 ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
                                      {daysUntilNextVisit > 0 ? `${daysUntilNextVisit} days away` : 'Overdue'}
                                    </p>
@@ -936,19 +950,19 @@ export default function Dashboard() {
                                  </div>
                                  <div>
                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Frequency</p>
-                                   <p className="text-sm text-gray-900">Every {client.recommendedFrequency} weeks</p>
-                                   <p className="text-xs text-gray-500">Last: {new Date(client.lastVisit).toLocaleDateString()}</p>
+                                   <p className="text-sm text-gray-900">Every {primaryDog.recommendedFrequency} weeks</p>
+                                   <p className="text-xs text-gray-500">Last: {new Date(primaryDog.lastVisit).toLocaleDateString()}</p>
                                  </div>
                                </div>
 
                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                                  <div>
                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Behavior Notes</p>
-                                   <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded">{client.behaviorNotes}</p>
+                                   <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded">{primaryDog.behaviorNotes}</p>
                                  </div>
                                  <div>
                                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Grooming Notes (Staff Only)</p>
-                                   <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded">{client.groomingNotes}</p>
+                                   <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded">{primaryDog.groomingNotes}</p>
                                  </div>
                                </div>
                              </div>
